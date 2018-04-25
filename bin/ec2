@@ -1,0 +1,155 @@
+#! /usr/bin/env node
+
+var util        = require('util'),
+    fs          = require('fs'),
+    aws         = require('aws-sdk'),
+    ec2         = new aws.EC2(),
+    vpcSubnets  = [ '51098f34', '6eca0f37', 'e74bef90' ],
+    params = {
+      MinCount:         1,
+      MaxCount:         1,
+      InstanceType:     't2.micro',
+      SecurityGroupIds: [ 'sg-d1b7ebb4'],
+      KeyName:          'itlab-aws',
+      SubnetId:         'subnet-' + vpcSubnets[ Math.floor(Math.random() * vpcSubnets.length) ]
+    },
+    ec2Region   = 'us-west-2',
+    procNode    = process.argv.shift(),
+    procName    = process.argv.shift(),
+    osName      = null,
+    instName    = null,
+    arg,
+    param;
+
+
+while (process.argv.length > 0) {
+  arg   = process.argv.shift().replace(/^--/, '');
+  param = process.argv.shift();
+
+  switch (arg) {
+
+  case 'region':
+    ec2Region = param;
+    break;
+
+  case 'name':
+    instName = param;
+    break;
+
+  case 'user-data':
+    params['UserData'] = fs.readFileSync(param).toString('base64');
+    break;
+
+  case 'iam-instance-profile':
+    // =arn
+    params['IamInstanceProfile'] = { Arn: param };
+    break;
+
+  case 'placement':
+    params['Placement'] = JSON.parse(param);
+    break;
+
+  default:
+    if (!param && /^ami-[0-9a-fAF]+$/.test(arg) && !params['ImageId']) {
+      // the image name
+      params.ImageId = arg;
+    } else {
+      // convert foo-bar-baz to FooBarBaz
+      paramName = arg.split('-').map(function (p) {
+        return p.slice(0,1).toUpperCase() + p.slice(1).toLowerCase();
+      }).join('');
+      params[paramName] = param;
+    }
+    break;
+  }
+}
+
+aws.config.update({ region: ec2Region });
+
+if (!params.ImageId) {
+  console.error('An AMI ID is required');
+  process.exit(1);
+}
+
+ec2.runInstances(params, function (err, data) {
+  var interval = null,
+      instances = data ? data.Instances : [],
+      states = {};
+  
+  if (err) {
+    console.error('Failed to create instances:', err, err.stack);
+  } else {
+    instances.forEach(function (i) {
+      states[i.InstanceId] = 'pending/initializing';
+      console.log('    ', i.InstanceId, states[i.InstanceId]);
+    });
+
+    if (instName) {
+      ec2.createTags({
+        Resources: instances.map(function (i) { return i.InstanceId; }),
+        Tags: [{
+          Key: 'Name',
+          Value: instName
+        }]
+      }, function(err, data) {
+        if (err) {
+          console.log(err, err.stack);
+        }
+      });
+    }
+
+    interval = setInterval(function () {
+      ec2.describeInstanceStatus({
+        InstanceIds: instances.map(function (i) { return i.InstanceId; }),
+        IncludeAllInstances: true
+      }, function (err, data) {
+        if (err) {
+          console.error(err, err.stack);
+        } else {
+          //console.log(util.inspect(data, { colors: true, depth: null }));
+          data.InstanceStatuses.forEach(function (i) {
+            if (states[i.InstanceId] !== i.InstanceState.Name + '/' + i.InstanceStatus.Status) {
+              states[i.InstanceId] = i.InstanceState.Name + '/' + i.InstanceStatus.Status;
+              console.log('    ', i.InstanceId, states[i.InstanceId]);
+            }
+          });
+          if (Object.keys(states)
+              .map(function (s) { return states[s]; })
+              .every(function (s) { return s === 'running/ok'; }))
+          {
+            clearInterval(interval);
+            ec2.describeInstances({
+              InstanceIds: instances.map(function (i) { return i.InstanceId; }),
+            }, function (err, data) {
+              if (err) {
+                console.error(err, err.stack);
+              } else {
+                console.log("Instance\tName\t\tAMI\t\tType\t\tKey Name\tPublic DNS Name");
+                data.Reservations.forEach(function (r) {
+                  r.Instances.forEach(function (i) {
+                    var nameTags = i.Tags.filter(function (t) {
+                                     return t.Key && t.Key === 'Name';
+                                   }),
+                        nameVal  = (nameTags && nameTags.length && nameTags.length > 0)
+                                 ? nameTags.pop().Value
+                                 : "UNNAMED";
+
+                    console.log([
+                      i.InstanceId,
+                      nameVal,
+                      i.ImageId,
+                      i.InstanceType,
+                      i.KeyName,
+                      i.PublicDnsName
+                    ].join("\t"));
+                  });
+                });                    
+              }
+            });
+          }
+        }
+      });
+    }, 10000);
+  }
+});
+

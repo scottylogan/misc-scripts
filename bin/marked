@@ -1,0 +1,9 @@
+#! /bin/sh
+
+MARKED='/Applications/Marked 2.app'
+OPTS=
+
+[ $# -gt 0 ] && OPTS=-a
+
+open ${OPTS} "${MARKED}" "$*"
+

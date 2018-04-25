@@ -1,0 +1,6 @@
+#! /bin/sh
+
+server=ldap.stanford.edu
+base=cn=`basename $0`,dc=stanford,dc=edu
+
+ldapsearch -h ${server} -b ${base} $*

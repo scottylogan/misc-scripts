@@ -1,0 +1,3 @@
+#! /bin/bash
+
+exec mysql --login-path=itlab --defaults-group-suffix=itlab $*
