@@ -10,9 +10,11 @@ nwords=$(wc -l ${WORDS} | sed 's/[^0-9]//g')
 
 phrase=""
 nphrasewords=0
+# bash $RANDOM is between 0 and 32767, so find a multiplication factor to use all the words
+factor=$(($nwords / 32768))
 
 while [ ${nphrasewords} -lt 4 ]; do
-    rand=${RANDOM}
+    rand=$((${RANDOM} * ${factor} + ${RANDOM}))
     if [ "${rand}" -lt ${nwords} ]; then
         newword=$(grep "^${rand}," ${WORDS} | cut -d, -f2)
         if [ -n ${newword} ]; then
