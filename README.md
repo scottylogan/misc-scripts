@@ -1,5 +1,7 @@
 # Miscellaneous Scripts
 
+`ec2` is now part of `ec2-tools`, called `ec2-run`.
+
 ## LDAP Scripts
 
 ### accounts attribute=value [attrs]
@@ -16,19 +18,6 @@ Wrapper around an LDAP search for the Stanford People tree.
 ### bastion name
 
 SSH to `bastion.${name}.stanford.edu`
-
-### ec2 [ami-id]
-
-Create a new EC2 instance in the default ITLab VPC in the us-west-2 AZ.
-
-|Option  |Argument|Default  |Description|
-|--------|--------|---------|-----------|
-|--region|string  |us-west-2|Region in which to create the instance|
-|--name  |string  |_none_   |Name of the instance (used for the _Name_ tag)|
-|--user-data|filename|_none_|File to include as user-data for the instance|
-|--iam-instance-profile|string (ARN)|_none_|instance profile to assign to new instance|
-
-Any other options are converted from `--this-special-option value` to `ThisSpecialOption: "value"` in the call to create the instance.
 
 ### my-deb-s3
 
