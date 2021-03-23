@@ -1,4 +1,5 @@
 #! /bin/bash
 
 tree=$(basename "$0")
+tree=${tree/ldap/}
 ldapsearch -Q -LLL -b "cn=${tree},dc=stanford,dc=edu" "$@"
