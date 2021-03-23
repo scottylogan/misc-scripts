@@ -1,0 +1,18 @@
+#! /bin/bash
+
+USER=${USER:-$(id -u -n)}
+
+# check default curl for SecureTransport support
+curl --version | grep -v SecureTransport | grep -q SecureTransport && CURL=curl
+
+CURL=${CURL:-$(/usr/bin/curl --version | grep -q SecureTransport && echo /usr/bin/curl)}
+
+[ -z "${CURL}" ] && echo Failed to find curl with SecureTransport support >&2 && exit 1
+
+CARDINAL_KEY=${CARDINAL_KEY:-$(security find-certificate -a -c "${USER}" |\
+                               awk -F\" '$2 == "labl" && $4 ~ /Enrollment/ { print $4; exit; }')}
+
+[ -z "${CARDINAL_KEY}" ] && echo Failed to find a Cardinal Key >&2 && exit 1
+
+CURL_SSL_BACKEND=secure-transport exec "${CURL}" -E "${CARDINAL_KEY}" "$@"
+
