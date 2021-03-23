@@ -1,6 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
-server=ldap.stanford.edu
-base=cn=`basename $0`,dc=stanford,dc=edu
-
-ldapsearch -h ${server} -b ${base} $*
+tree=$(basename "$0")
+ldapsearch -Q -LLL -b "cn=${tree},dc=stanford,dc=edu" "$@"
