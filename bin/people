@@ -2,4 +2,4 @@
 
 tree=$(basename "$0")
 tree=${tree/ldap/}
-ldapsearch -Q -LLL -b "cn=${tree},dc=stanford,dc=edu" "$@"
+ldapsearch -o ldif-wrap=no -Q -LLL -b "cn=${tree},dc=stanford,dc=edu" "$@"
