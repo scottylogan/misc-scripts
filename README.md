@@ -4,27 +4,27 @@
 
 ## LDAP Scripts
 
-### accounts attribute=value [attrs]
+### `accounts` _attribute=value [attrs]_
 
 Wrapper around an LDAP search for the Stanford Accounts tree.
 
-### people attribute=value [attrs]
+### `people` _attribute=value [attrs]_
 
 Wrapper around an LDAP search for the Stanford People tree.
 
 
 ## IT Lab Scripts
 
-### bastion name
+### `bastion` _[name]_
 
 SSH to `bastion.${name}.stanford.edu`
 
-### my-deb-s3
+### `my-deb-s3`
 
 Wrapper around the `deb-s3` Ruby Gem to update the IT Lab APT repo
 (http://repo.itlab.stanford.edu).
 
-### mysql-itlab
+### `mysql-itlab`
 
 Wrapper script to connect to the IT Lab MySQL server. This script requires a
 `~/.mylogin.cnf` file (created with
@@ -38,11 +38,11 @@ Wrapper script to connect to the IT Lab MySQL server. This script requires a
 
 ## Password and Passphrase Scripts
 
-### passphrase
+### `passphrase`
 
 Generate a four word passphrase.
 
-### pwgen
+### `pwgen` _[options]_
 
 Generate a password.
 
@@ -56,10 +56,17 @@ Generate a password.
 
 ## Other Scripts
 
-### yubikey
+### `yubikey`
 
 Update SSH Agent to use / not use the PKCS11 provider for Yubikey. Run
 `yubikey` after inserting or removing a Yubikey containing an SSH
 keypair. It will prompt for PIN / touch as required.
 
-### marked
+### `marked` _file.md_
+
+Open a file with the [Marked](https://marked2app.com/) Markdown previewer
+
+### `git-touch`
+
+Recursively set the timestamps on all the files in the local directory
+to their last commit date / time.
