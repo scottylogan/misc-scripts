@@ -1,0 +1,8 @@
+#! /bin/sh
+
+git ls-files | while read f; do
+  touch -m -t $(git --no-pager log -1 --date=format:%Y%m%d%H%M --pretty=format:%cd -- $f) $f
+done
+
+
+
