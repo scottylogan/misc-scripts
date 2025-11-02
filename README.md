@@ -1,41 +1,5 @@
 # Miscellaneous Scripts
 
-`ec2` is now part of `ec2-tools`, called `ec2-run`.
-
-## LDAP Scripts
-
-### `accounts` _attribute=value [attrs]_
-
-Wrapper around an LDAP search for the Stanford Accounts tree.
-
-### `people` _attribute=value [attrs]_
-
-Wrapper around an LDAP search for the Stanford People tree.
-
-
-## IT Lab Scripts
-
-### `bastion` _[name]_
-
-SSH to `bastion.${name}.stanford.edu`
-
-### `my-deb-s3`
-
-Wrapper around the `deb-s3` Ruby Gem to update the IT Lab APT repo
-(http://repo.itlab.stanford.edu).
-
-### `mysql-itlab`
-
-Wrapper script to connect to the IT Lab MySQL server. This script requires a
-`~/.mylogin.cnf` file (created with
-[`mysql_config_editor`](https://dev.mysql.com/doc/refman/5.7/en/mysql-config-editor.html) containing a `itlab` login-path. Further customization is possible using the `[clientitlab]` section in `~/.my.cnf`; for example:
-
-```
-    [clientitlab]
-    ssl-ca = /Users/swl/share/ssl/certs/rds-combined-ca-bundle.pem
-    ssl-mode = VERIFY_IDENTITY
-```
-
 ## Password and Passphrase Scripts
 
 ### `passphrase`
@@ -53,7 +17,6 @@ Generate a password.
 |-y     |Include punctuation|
 |-a     |Equivalent to `-c -n -y`|
 
-
 ## Other Scripts
 
 ### `yubikey`
@@ -62,11 +25,24 @@ Update SSH Agent to use / not use the PKCS11 provider for Yubikey. Run
 `yubikey` after inserting or removing a Yubikey containing an SSH
 keypair. It will prompt for PIN / touch as required.
 
-### `marked` _file.md_
-
-Open a file with the [Marked](https://marked2app.com/) Markdown previewer
-
 ### `git-touch`
 
 Recursively set the timestamps on all the files in the local directory
 to their last commit date / time.
+
+### `capturepages`
+
+Capture all page title and URLs from Chrome as Markdown, using [chrome://inspect#pages]
+
+## Stanford LDAP Scripts
+
+### `su-ldap`
+
+Wrapper around an LDAP search. Copy / symlink `su-ldap` to make shortcuts for specific trees:
+
+* `accounts` - search the Stanford Accounts tree
+* `ldapgroups` - search the Stanford Groups tree
+* `people` - search the Stanford People tree
+
+Usage: `script` _searchfilter_ _[attrs]_
+

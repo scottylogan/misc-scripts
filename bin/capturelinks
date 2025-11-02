@@ -1,0 +1,51 @@
+#! /usr/bin/env awk -f
+
+#
+# The content of chrome://inspect/#pages looks like:
+#
+#   DevTools
+#   Devices
+#   Pages
+#   Extensions
+#   Apps
+#   Shared workers
+#   Service workers
+#   Shared storage worklets
+#   Other
+#   Pages
+# 
+#   {Page Title}
+#   {Page URL}
+#   {iframe URL}
+#   {iframe URL}
+#   ...
+# 
+#   {Page Title}
+#   {Page URL}
+#   {iframe URL}
+#   ...
+
+BEGIN {
+  if (system("tty -s") == 0) {
+    # input is a terminal
+    print "Paste the content from chrome://inspect/#pages here, then press return then ^D" > "/dev/stderr"
+  }
+  system("date '+# Chrome Links from %B %e, %Y %H:%M' | sed 's/  / /g'")
+  print
+  title = ""
+}
+
+# Capture page title
+!/^http/ {
+  title = $0
+}
+
+# Capture page link
+/^http/ {
+  if (title != "") {
+    # output markdown link if title is set
+    printf("* [%s](%s)\n", title, $0)
+    # clear the title to skip the other links
+    title = ""
+  }
+}

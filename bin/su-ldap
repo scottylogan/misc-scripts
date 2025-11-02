@@ -1,0 +1,5 @@
+#! /bin/bash
+
+tree=$(basename "$0")
+tree=${tree/ldap/}
+ldapsearch -o ldif-wrap=no -Q -LLL -b "cn=${tree},dc=stanford,dc=edu" "$@"
