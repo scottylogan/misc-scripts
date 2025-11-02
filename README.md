@@ -25,6 +25,10 @@ Update SSH Agent to use / not use the PKCS11 provider for Yubikey. Run
 `yubikey` after inserting or removing a Yubikey containing an SSH
 keypair. It will prompt for PIN / touch as required.
 
+### `marked` _file.md_
+
+Open a file with the [Marked](https://marked2app.com/) Markdown previewer
+
 ### `git-touch`
 
 Recursively set the timestamps on all the files in the local directory
