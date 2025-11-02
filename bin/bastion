@@ -1,5 +1,0 @@
-#! /bin/bash
-
-host=${1:-itlab}
-
-exec ssh bastion.${host}.stanford.edu
