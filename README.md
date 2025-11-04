@@ -17,6 +17,10 @@ Generate a password.
 |-y     |Include punctuation|
 |-a     |Equivalent to `-c -n -y`|
 
+### `mkpwdldif` _cn_ _[password]_
+
+Generate the LDIF to change the AD password for the user identified by _cn_. If _password_ isn't sepcificied one is prompted for.
+
 ## Other Scripts
 
 ### `yubikey`
