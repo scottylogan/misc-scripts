@@ -2,25 +2,81 @@
 
 ALLWORDS=/usr/share/dict/words
 #ALLWORDS=$HOME/share/words-1000-2000.txt
-WORDS=/tmp/words
+WORDS=$(/usr/bin/mktemp -t passphrase-$$)
 
-rm -f ${WORDS}
-egrep '^....+$' ${ALLWORDS} | cat -n | sed -e 's/ //g' | tr '[\011A-Z]' '[,a-z]' > ${WORDS}
-nwords=$(wc -l ${WORDS} | sed 's/[^0-9]//g')
+trap "rm -f ${WORDS}" 0 15
+
+NWORDS=4
+MINLEN=4
+MAXLEN=
+SEP=" "
+
+usage() {
+  echo "Usage: $(basename $0) [-m minwordlen] [-M maxwordlen] [-n num-words] [-s separator] [-h]" >&2
+  echo "Defaults: -m ${MINLEN} -M ${MAXLEN:-infinity} -n ${NWORDS} -s '${SEP}'" >&2
+  exit 2
+}
+
+args=`getopt hm:M:n:s: $*`
+[ $? -ne 0 ] && usage
+
+set -- $args
+while :; do
+  case "$1" in
+    -m)
+      MINLEN=$2
+      shift; shift
+      ;;
+    -M)
+      MAXLEN=$2
+      shift; shift
+      ;;
+    -n)
+      NWORDS=$2
+      shift; shift
+      ;;
+    -s)
+      SEP=$2
+      shift; shift
+      ;;
+    -h)
+      usage
+      ;;
+    --)
+      shift
+      break
+      ;;
+  esac
+done
+
+if [ "${MINLEN}" -lt 4 ]; then
+  echo "Minimum length (${MINLEN}) too short" >&2
+  exit 2
+fi
+
+if [ -n "${MAXLEN}" ]; then
+  if [ "${MAXLEN}" -lt "${MINLEN}" ]; then
+    echo "Maximum length (${MAXLEN}) shorter than minimum length (${MINLEN})" >&2
+    exit 2
+  fi
+fi
+
+egrep "^.{${MINLEN},${MAXLEN}}\$" ${ALLWORDS} | cat -n | sed -e 's/ //g' | tr '[\011A-Z]' '[,a-z]' >> ${WORDS}
+nwords=$(wc -l ${WORDS} | sed 's/ .*//g')
 
 phrase=""
 nphrasewords=0
 # bash $RANDOM is between 0 and 32767, so find a multiplication factor to use all the words
 factor=$(($nwords / 32768))
 
-while [ ${nphrasewords} -lt 4 ]; do
+while [ ${nphrasewords} -lt ${NWORDS} ]; do
     rand=$((${RANDOM} * ${factor} + ${RANDOM}))
     if [ "${rand}" -lt ${nwords} ]; then
         newword=$(grep "^${rand}," ${WORDS} | cut -d, -f2)
         if [ -n ${newword} ]; then
-            phrase="${phrase} ${newword}"
-            nphrasewords=$(expr ${nphrasewords} + 1)
+            phrase="${phrase}${SEP}${newword}"
+            nphrasewords=$((nphrasewords + 1))
         fi
     fi
 done
-echo $phrase | sed 's/ $//g'
+echo $phrase | sed "s/^${SEP}//g"

@@ -2,9 +2,17 @@
 
 ## Password and Passphrase Scripts
 
-### `passphrase`
+### `passphrase` _[options]_
 
-Generate a four word passphrase.
+Generate a passphrase.
+
+| Option | Description                    |
+|--------|--------------------------------|
+| -h     | show usage / help and defaults |
+| -m N   | set minimum word length        |
+| -M N   | set maximum word length        |
+| -n N   | set number of words            |
+| -s C   | set word separator             |
 
 ### `pwgen` _[options]_
 
