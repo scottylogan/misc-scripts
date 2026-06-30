@@ -18,12 +18,12 @@ Generate a passphrase.
 
 Generate a password.
 
-|Option |Description|
-|-------|-----------|
-|-c     |Include capital / upper case letters|
-|-n     |Include numbers / digits|
-|-y     |Include punctuation|
-|-a     |Equivalent to `-c -n -y`|
+| Option | Description                          |
+|--------|--------------------------------------|
+| -c     | include capital / upper case letters |
+| -n     | include numbers / digits             |
+| -y     | include punctuation                  |
+| -a     | equivalent to `-c -n -y`             |
 
 ## Other Scripts
 

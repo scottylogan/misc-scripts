@@ -34,12 +34,17 @@ $pwchars = $lower;
 getopts('acdny');
 $pwchars .= $upper if ($opt_c || $opt_a);
 $pwchars .= $digits if ($opt_n || $opt_d || $opt_a);
-$pwchars .= $punc if ($opt_y || $opt_a);
+#$pwchars .= $punc if ($opt_y || $opt_a);
 
 $len = ($#ARGV < 0)  ? 8 : $ARGV[0];
 $pw = '';
 for ($i = 0; $i < $len; $i++) {
-  $pw .= substr($pwchars, length($pwchars)*rand(), 1);
+  $chars = $pwchars;
+  if (($opt_y || $opt_a) && rand()*5 % 5 == 0) {
+    $chars = $punc;
+  }
+
+  $pw .= substr($chars, length($chars)*rand(), 1);
 }
 printf "%s\n", $pw;
 
