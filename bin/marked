@@ -1,9 +1,10 @@
 #! /bin/sh
 
-MARKED='/Applications/Marked 2.app'
+APP='/Applications/Marked 2.app'
+[ ! -d "${APP}" ] && APP='/Applications/Markdown Preview.app'
 OPTS=
 
 [ $# -gt 0 ] && OPTS=-a
 
-open ${OPTS} "${MARKED}" "$*"
+open ${OPTS} "${APP}" "$*"
 
